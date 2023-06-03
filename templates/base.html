@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% extends 'bootstrap/base.html' %}
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+            Title
+        {% endblock %}
+    </title>
+</head>
+<body>
+{% block navbar %}
+    <nav style="background-color: crimson" class="navbar nav-justified">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                {% for link, i in links.items() %}
+                    <li class="nav">
+                        <a style="font-family: Comic Sans MS,serif;
+                        color: chartreuse;
+                        font-size: large;
+                        text-decoration: None"
+                           href="{{ link }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+</body>
+</html>
