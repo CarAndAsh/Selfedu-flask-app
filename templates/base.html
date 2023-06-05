@@ -6,26 +6,28 @@
     <meta charset="UTF-8">
     <title>
         {% block title %}
-            Title
+            {% if title %}
+                {{ title }}
+            {% endif %}
         {% endblock %}
     </title>
 </head>
 <body>
-{% block navbar %}
-    <nav class="navbar navbar-static-top" style="background-color: crimson">
+    {% block navbar %}
+        <nav class="navbar navbar-static-top" style="background-color: crimson">
             <ul style="list-style-type: none; display: flex; justify-content: space-between">
-                {% for link, i in links.items() %}
+                {% for i in links %}
                     <li class="navbar-text">
                         <a style="font-family: Comic Sans MS,serif;
                         color: chartreuse;
                         font-size: large;
                         text-decoration: None"
-                           href="{{ link }}">{{ i }}</a>
+                           href="{{ i.url }}">{{ i.title }}</a>
                     </li>
                 {% endfor %}
             </ul>
-    </nav>
-{% endblock %}
+        </nav>
+    {% endblock %}
 
 {% block content %}
 

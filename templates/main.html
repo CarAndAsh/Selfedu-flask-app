@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p> Главная страница</p>
+    {{ super() }}
+    <h2>Cписок статей</h2>
+    <ul class="posts-list">
+        {% for post in posts %}
+        <li>{{ post.title }}</li>
+        {% endfor %}
+    </ul>
+
 {% endblock %}
