@@ -11,3 +11,4 @@ CREATE TABLE IF NOT EXISTS posts
     post  VARCHAR NOT NULL,
     time INTEGER NOTE NULL
 );
+

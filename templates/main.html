@@ -3,10 +3,10 @@
 {% block content %}
     {{ super() }}
     <h2>Cписок статей</h2>
-    <ul class="posts-list">
-        {% for post in posts %}
-        <li>{{ post.title }}</li>
-        {% endfor %}
-    </ul>
+        <ul class="posts-list">
+            {% for post in posts %}
+                <li><a href="/post/{{ post.id }}">{{ post.title }}</a></li>
+            {% endfor %}
+        </ul>
 
 {% endblock %}

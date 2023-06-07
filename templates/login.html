@@ -2,12 +2,15 @@
 {% block content %}
     {{ super() }}
     {% for cat, msg in get_flashed_messages(True) %}
-        <p><div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div></p>
+        <p>
+        <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div></p>
     {% endfor %}
-    <form action="/login" method="post" class="form-group">
-        <p><label>Логин :</label> <input type="text" name="username"/>
-        <p><label>Пароль :</label> <input type="text" name="password"/>
-        <p><input type="submit" value="Отправить"/>
-    </form>
+    <div class="container-fluid">
+        <form action="/login" method="post" class="form-group">
+            <p><label>Логин :</label> <input type="text" name="username"/>
+            <p><label>Пароль :</label> <input type="text" name="password"/>
+            <p><input type="submit" value="Отправить"/>
+        </form>
+    </div>
 
 {% endblock %}

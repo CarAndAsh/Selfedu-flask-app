@@ -3,12 +3,15 @@
 {% block content %}
     {{ super() }}
     {% for cat, msg in get_flashed_messages(True) %}
-        <p><div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div>
+        <p>
+        <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div>
     {% endfor %}
-<form action="{{ url_for('add_post') }}" method="post" class="form">
-    <p><label>Заголовок статьи :</label> <input type="text" name="title" value="" required/>
-    <p><label>Текст статьи :</label>
-    <p><textarea name="post" type="text"></textarea>
-    <p><input type="submit" value="Добавить"</p>
-</form>
+    <div class="container-fluid">
+        <form action="{{ url_for('add_post') }}" method="post" class="form">
+            <p><label>Заголовок статьи :</label> <input type="text" name="title" value="" required/>
+            <p><label>Текст статьи :</label>
+            <p><textarea name="post" type="text"></textarea>
+            <p><input type="submit" value="Добавить"</p>
+        </form>
+    </div>
 {% endblock %}

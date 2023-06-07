@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, request, flash, redirect, g
+from itertools import cycle
+from flask import Flask, render_template, request, flash, redirect, g, abort
 from flask_bootstrap import Bootstrap
 import sqlite3
 
@@ -44,7 +45,18 @@ def get_db():
 def main_page():
     db = get_db()
     dbase = FDataBase(db)
-    return render_template('main.html', links=dbase.get_menu())
+    return render_template('main.html', links=dbase.get_menu(),
+                           posts=dbase.get_posts())
+
+
+@blog.route('/post/<int:post_id>')
+def post_page(post_id):
+    db = get_db()
+    dbase = FDataBase(db)
+    post = dbase.get_post(post_id)
+    if not post:
+        abort(404)
+    return render_template('post.html', links=dbase.get_menu(), post=post)
 
 
 @blog.route('/add_post', methods=['GET', 'POST'])

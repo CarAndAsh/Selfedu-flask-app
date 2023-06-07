@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {{ super() }}
+    <div class="container-fluid">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.post }}</p>
+    </div>
+{% endblock %}
