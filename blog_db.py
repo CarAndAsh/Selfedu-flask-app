@@ -68,6 +68,22 @@ class FDataBase:
             self.__cur.execute('''INSERT INTO posts VALUES (NULL,?,?,?,?)''', (title, post_fmtd, post_time, url))
             self.__db.commit()
         except:
-            print('Insertion error')
+            print('Insertion post error')
+            return False
+        return True
+
+    def add_user(self, user, email, hpswd):
+        try:
+            self.__cur.execute(f'''SELECT COUNT() AS "count" FROM "users" WHERE email LIKE "{email}"''')
+            res = self.__cur.fetchone()
+            if res['count'] > 0:
+                print('user with this email already exists')
+                return False
+
+            reg_time = datetime.datetime.now().timestamp()
+            self.__cur.execute('''INSERT INTO users VALUES (NULL,?,?,?,?)''', (user, email, hpswd, reg_time))
+            self.__db.commit()
+        except:
+            print('Insertion user error')
             return False
         return True
