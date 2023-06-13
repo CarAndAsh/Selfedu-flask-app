@@ -3,10 +3,20 @@
 {% block content %}
     {{ super() }}
     <h2>Cписок статей</h2>
+    {% if posts %}
         <ul class="posts-list">
             {% for post in posts %}
-                <li><a href="/post/{{ post.id }}">{{ post.title }}</a></li>
+                <li class="container bg-warning table-bordered text-justify" style="margin: 1%; list-style-type: none;">
+                    <h3 class=" link-title"><a href="{{ url_for('post_page', alias=post.url ) }}">{{ post.title }}</a>
+                    </h3>
+                    {% if post.post|length > 50 %}
+                        <p class="announce">{{ post.post[:50]|striptags + '...' }}</p>
+                    {% else %}
+                        <p class="announce">{{ post.post|striptags }}</p>
+                    {% endif %}
+                </li>
             {% endfor %}
         </ul>
+    {% endif %}
 
 {% endblock %}

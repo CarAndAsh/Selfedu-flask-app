@@ -9,9 +9,10 @@
     <div class="container-fluid">
         <form action="{{ url_for('add_post') }}" method="post" class="form">
             <p><label>Заголовок статьи :</label> <input type="text" name="title" value="" required/>
+            <p><label>URL статьи :</label> <input type="text" name="url" value="" required/>
             <p><label>Текст статьи :</label>
             <p><textarea name="post" type="text"></textarea>
-            <p><input type="submit" value="Добавить"</p>
+            <p><input type="submit" value="Добавить"/>
         </form>
     </div>
 {% endblock %}

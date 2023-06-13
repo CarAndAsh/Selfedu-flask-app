@@ -49,11 +49,11 @@ def main_page():
                            posts=dbase.get_posts())
 
 
-@blog.route('/post/<int:post_id>')
-def post_page(post_id):
+@blog.route('/post/<alias>')
+def post_page(alias):
     db = get_db()
     dbase = FDataBase(db)
-    post = dbase.get_post(post_id)
+    post = dbase.get_post(alias)
     if not post:
         abort(404)
     return render_template('post.html', links=dbase.get_menu(), post=post)
@@ -65,7 +65,7 @@ def add_post():
     dbase = FDataBase(db)
 
     if request.method == 'POST':
-        req_data = (request.form['title'], request.form['post'])
+        req_data = (request.form['title'], request.form['post'], request.form['url'])
         if all(req_data):
             res = dbase.add_post(*req_data)
             if not res:

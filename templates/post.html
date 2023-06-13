@@ -4,6 +4,6 @@
     {{ super() }}
     <div class="container-fluid">
         <h2>{{ post.title }}</h2>
-        <p>{{ post.post }}</p>
+        <p>{{ post.post|safe }}</p>
     </div>
 {% endblock %}

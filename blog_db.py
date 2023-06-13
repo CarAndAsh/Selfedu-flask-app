@@ -1,4 +1,7 @@
 import datetime
+import re
+
+from flask import url_for
 
 
 class FDataBase:
@@ -26,9 +29,9 @@ class FDataBase:
             print('Read posts error')
             return []
 
-    def get_post(self, id):
+    def get_post(self, alias):
         try:
-            self.__cur.execute(f'''SELECT * FROM posts WHERE id == {id} LIMIT 1''')
+            self.__cur.execute(f'''SELECT * FROM posts WHERE url LIKE '{alias}' LIMIT 1''')
             res = self.__cur.fetchone()
             if res:
                 return res
@@ -48,10 +51,21 @@ class FDataBase:
             print('Get cols error')
             return []
 
-    def add_post(self, title, post):
+    def add_post(self, title, post, url):
         try:
+            self.__cur.execute(f'''SELECT COUNT() AS "count" FROM "posts" WHERE url LIKE "{url}"''')
+            res = self.__cur.fetchone()
+            if res['count'] > 0:
+                print('post with this url already exists')
+                return False
+
+            base = url_for('static', filename='blog_posts')
+            ptrn = r'(?P<tag><img\s+[^>]*src=)(?P<quote>["\'])(?P<url>.+?)(?P=quote)>'
+            text = '\\g<tag>' + base + '/\\g<url>>'
+            post_fmtd = re.sub(ptrn, text, post)
+
             post_time = datetime.datetime.now().timestamp()
-            self.__cur.execute('''INSERT INTO posts VALUES (NULL,?,?,?)''', (title, post, post_time))
+            self.__cur.execute('''INSERT INTO posts VALUES (NULL,?,?,?,?)''', (title, post_fmtd, post_time, url))
             self.__db.commit()
         except:
             print('Insertion error')
