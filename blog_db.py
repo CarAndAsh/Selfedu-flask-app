@@ -1,5 +1,6 @@
 import datetime
 import re
+import sqlite3
 
 from flask import url_for
 
@@ -87,3 +88,25 @@ class FDataBase:
             print('Insertion user error')
             return False
         return True
+
+    def get_user(self, user_id):
+        try:
+            self.__cur.execute(f'''SELECT * FROM users WHERE id = {user_id} LIMIT 1''')
+            res = self.__cur.fetchone()
+            if res:
+                return res
+            print('No such user in DB')
+            return False
+        except sqlite3.Error as e:
+            print('DB error' + str(e))
+
+    def get_user_by_email(self, email):
+        try:
+            self.__cur.execute(f'''SELECT * FROM users WHERE email LIKE '{email}' LIMIT 1''')
+            res = self.__cur.fetchone()
+            if res:
+                return res
+            print('No user with this email in DB')
+            return False
+        except sqlite3.Error as e:
+            print('DB error' + str(e))

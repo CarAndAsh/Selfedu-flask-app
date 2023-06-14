@@ -2,11 +2,13 @@ import os
 from itertools import cycle
 from flask import Flask, render_template, request, flash, redirect, g, abort, make_response, url_for
 from flask_bootstrap import Bootstrap
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import sqlite3
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from blog_db import FDataBase
+from user_login import UserLogin
 
 blog = Flask(__name__)
 blog.config['SECRET_KEY'] = 'q12we34rt56y'
@@ -14,11 +16,20 @@ blog.config['DATABASE'] = 'tmp/blog_DB.db'
 b_blog = Bootstrap(blog)
 blog.config.update(dict(DATABASE=os.path.join(blog.root_path, 'blog_DB.db')))
 
+log_blog = LoginManager(blog)
+log_blog.login_message = 'Пожалуйста, войдите в ваш аккаунт для просмотра статей'
+log_blog.login_message_category = 'warning'
+log_blog.login_view = 'login_page'
+
 
 # links = {'/': 'Главная',
 #          '/materials': 'Статьи',
 #          '/login': 'Авторизация',
 #          '/about': 'О проекте'}
+@log_blog.user_loader
+def load_user(user_id):
+    print('loading user')
+    return UserLogin().from_db(user_id, dbase)
 
 
 def connect_db():
@@ -60,6 +71,7 @@ def main_page():
 
 
 @blog.route('/post/<alias>')
+@login_required
 def post_page(alias):
     post = dbase.get_post(alias)
     if not post:
@@ -96,23 +108,19 @@ def info_page():
 
 @blog.route('/login', methods=['POST', 'GET'])
 def login_page():
-    login = ''
+    if current_user.is_authenticated:
+        return redirect(url_for('profile_page'))
     if request.method == 'POST':
-        make_response().set_cookie('log_as', max_age=0)
+        email = request.form['e-mail']
+        user = dbase.get_user_by_email(email)
+        if user and check_password_hash(user['password'], request.form['password']):
+            logged_user = UserLogin().create(user)
+            rm = True if request.form.get('remember') else False
+            login_user(logged_user, remember=rm)
+            return redirect(request.args.get('next') or url_for('profile_page'))
+        flash('Wrong email or password', 'danger')
 
-        cat = 'warning'
-        if (username := request.form['username']) and (login := request.cookies.get('log_as')):
-            cat = 'success'
-            msg = f'Вы попытались зарегистрироваться или войти как {username}'
-            if request.form.get('remember'):
-                msg += ' и запомнить этого пользователя'
-        else:
-            msg = f'Пожалуйста, введите логин и пароль'
-        flash(msg, cat)
-
-        make_response().set_cookie('log_as', f'{username}')
-
-    return render_template('login.html', links=dbase.get_menu(), login=login)
+    return render_template('login.html', links=dbase.get_menu())
 
 
 @blog.route('/register', methods=['POST', 'GET'])
@@ -132,6 +140,20 @@ def register_page():
         else:
             flash('Неверно заполнены поля', 'danger')
     return render_template('register.html', links=dbase.get_menu())
+
+
+@blog.route('/profile')
+@login_required
+def profile_page():
+    return render_template('profile.html', user_info=current_user.get_id(), links=dbase.get_menu())
+
+
+@blog.route('/logout')
+@login_required
+def logout_page():
+    logout_user()
+    flash('Вы успешно вышли из аккаунта', 'success')
+    return redirect(url_for('login_page'))
 
 
 @blog.errorhandler(404)
