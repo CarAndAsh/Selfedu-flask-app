@@ -2,8 +2,7 @@
 {% block content %}
     {{ super() }}
     {% for cat, msg in get_flashed_messages(True) %}
-        <p>
-        <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div></p>
+        <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div>
     {% endfor %}
     <div class="container-fluid">
         <form action="" method="post" class="form-group">

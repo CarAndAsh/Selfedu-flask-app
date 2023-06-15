@@ -1,5 +1,6 @@
 import os
 from itertools import cycle
+
 from flask import Flask, render_template, request, flash, redirect, g, abort, make_response, url_for
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -13,6 +14,8 @@ from user_login import UserLogin
 blog = Flask(__name__)
 blog.config['SECRET_KEY'] = 'q12we34rt56y'
 blog.config['DATABASE'] = 'tmp/blog_DB.db'
+blog.config['MAX_CONTENT_LENGTH'] = 1024 * 1024  # 1MB
+
 b_blog = Bootstrap(blog)
 blog.config.update(dict(DATABASE=os.path.join(blog.root_path, 'blog_DB.db')))
 
@@ -145,7 +148,38 @@ def register_page():
 @blog.route('/profile')
 @login_required
 def profile_page():
-    return render_template('profile.html', user_info=current_user.get_id(), links=dbase.get_menu())
+    return render_template('profile.html', user_info=current_user, links=dbase.get_menu())
+
+
+@blog.route('/user_avatar')
+@login_required
+def user_avatar():
+    img = current_user.get_avatar(blog)
+    if not img:
+        return ''
+
+    ava = make_response(img)
+    ava.headers['Content-Type'] = 'image'
+    return ava
+
+
+@blog.route('/avatar_upload', methods=['POST', 'GET'])
+@login_required
+def avatar_upload():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and current_user.verify_ext(file.filename):
+            try:
+                img = file.read()
+                update = dbase.update_user_avatar(img, current_user.get_id())
+                if not update:
+                    flash('Не удалось обновить аватар пользователя', 'danger')
+                flash('Аватар пользователя успешно обновлен', 'success')
+            except FileNotFoundError as err:
+                flash('Ошибка чтения файла', 'danger')
+        else:
+            flash('Используйте *.bmp, *.jpg, *.jpeg, *.png файлы для  аватара', 'danger')
+    return redirect(url_for('profile_page'))
 
 
 @blog.route('/logout')

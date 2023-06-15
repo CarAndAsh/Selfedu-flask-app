@@ -82,7 +82,7 @@ class FDataBase:
                 return False
 
             reg_time = datetime.datetime.now().timestamp()
-            self.__cur.execute('''INSERT INTO users VALUES (NULL,?,?,?,?)''', (user, email, hpswd, reg_time))
+            self.__cur.execute('''INSERT INTO users VALUES (NULL,?,?,?,NULL,?)''', (user, email, hpswd, reg_time))
             self.__db.commit()
         except:
             print('Insertion user error')
@@ -97,8 +97,8 @@ class FDataBase:
                 return res
             print('No such user in DB')
             return False
-        except sqlite3.Error as e:
-            print('DB error' + str(e))
+        except sqlite3.Error as err:
+            print('DB error' + str(err))
 
     def get_user_by_email(self, email):
         try:
@@ -108,5 +108,18 @@ class FDataBase:
                 return res
             print('No user with this email in DB')
             return False
-        except sqlite3.Error as e:
-            print('DB error' + str(e))
+        except sqlite3.Error as err:
+            print('DB error' + str(err))
+
+    def update_user_avatar(self, img, user_id):
+        if not img:
+            return False
+
+        try:
+            bin_img = sqlite3.Binary(img)
+            self.__cur.execute(f'UPDATE users SET avatar = ? WHERE id = ?', (bin_img, user_id))
+            self.__db.commit()
+        except sqlite3.Error as err:
+            print('Update avatar error in DB' + str(err))
+            return False
+        return True

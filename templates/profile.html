@@ -2,6 +2,28 @@
 
 {% block content %}
     {{ super() }}
-    <p><a href="{{ url_for('logout_page') }}"> Выйти из профиля</a></p>
-    <p>user info: {{ user_info }}</p>
+    {% for cat, msg in get_flashed_messages(True) %}
+        <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div>
+    {% endfor %}
+    <table>
+        <td>
+            <tr>
+                <div class="img-circle"><img src="{{ url_for('user_avatar') }}" alt=""></div>
+                <div class="">
+                    <form action="{{ url_for('avatar_upload') }}" method="post" enctype="multipart/form-data">
+                        <p><input type="file" name="file"></p>
+                        <p><input type="submit" value="Загрузить"></p>
+                    </form>
+                </div>
+
+            </tr>
+        </td>
+        <td>
+            <tr>
+                <p>Никнейм пользователя : {{ current_user.get_name() }}</p>
+                <p>E-mail пользователя : {{ current_user.get_email() }}</p>
+                <p><a href="{{ url_for('logout_page') }}"> Выйти из профиля</a></p>
+            </tr>
+        </td>
+    </table>
 {% endblock %}
