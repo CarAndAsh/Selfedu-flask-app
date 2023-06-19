@@ -4,13 +4,22 @@
     {% for cat, msg in get_flashed_messages(True) %}
         <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div>
     {% endfor %}
-    <div class="container-fluid">
+    <div class="container-fluid text-center">
         <form action="/register" method="post" class="form-group">
-            <p><label>Логин :</label> <input type="text" name="username"/>
-            <p><label>E-mail :</label> <input type="text" name="e-mail"/>
-            <p><label>Пароль :</label> <input type="password" name="password"/>
-            <p><label>Повторите пароль :</label> <input type="password" name="password_sbmt"/>
-            <p><input type="submit" value="Зарегистрироваться"/>
+            {# form with cicle #}
+            <p>{{ form.hidden_tag() }}</p>
+            {% for field in form if field.name not in('csrf_token', 'submit') %}
+                <p>
+                    {{ field.label() }} {{ field() }}
+                    {% if field.errors %}
+                        {% for err in field.errors %}
+                            <span class="text-danger bg-danger alert">{{ err }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <p>{{ form.submit() }}</p>
+            <hr width="300">
             <p><a href="{{ url_for('login_page') }}">Войти</a>
         </form>
     </div>

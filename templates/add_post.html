@@ -6,13 +6,21 @@
         <p>
         <div class="text-{{ cat }} bg-{{ cat }} alert container">{{ msg }}</div>
     {% endfor %}
-    <div class="container-fluid">
+    <div class="container-fluid text-center">
         <form action="{{ url_for('add_post') }}" method="post" class="form">
-            <p><label>Заголовок статьи :</label> <input type="text" name="title" value="" required/>
-            <p><label>URL статьи :</label> <input type="text" name="url" value="" required/>
-            <p><label>Текст статьи :</label>
-            <p><textarea name="post" type="text"></textarea>
-            <p><input type="submit" value="Добавить"/>
+            <p>{{ form.hidden_tag() }}</p>
+            {% for field in form if field.name not in('csrf_token', 'submit') %}
+                <p>
+                    {{ field.label() }} {{ field() }}
+                    {% if field.errors %}
+                        {% for err in field.errors %}
+                            <span class="text-danger bg-danger alert">{{ err }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <p>{{ form.submit() }}</p>
         </form>
+
     </div>
 {% endblock %}

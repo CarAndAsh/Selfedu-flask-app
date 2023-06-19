@@ -10,24 +10,24 @@
     </title>
 </head>
 <body>
-    {% block navbar %}
-        <nav class="navbar navbar-static-top" style="background-color: crimson">
-            <ul style="list-style-type: none; display: flex; justify-content: space-between">
-                {% for i in links %}
-                    <li class="navbar-text">
-                        <a style="font-family: Comic Sans MS,serif;
+{% block navbar %}
+    <nav class="navbar navbar-static-top" style="background-color: crimson">
+        <ul style="list-style-type: none; display: flex; justify-content: space-between">
+            {% for i in links %}
+                <li class="navbar-text">
+                    <a style="font-family: Comic Sans MS,serif;
                         color: chartreuse;
                         font-size: large;
                         text-decoration: None"
-                           href="{{ i.url }}">{{ i.title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </nav>
-    {% endblock %}
+                       href="{{ i.url }}">{{ i.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endblock %}
 
 {% block content %}
-
 {% endblock %}
+
 </body>
 </html>

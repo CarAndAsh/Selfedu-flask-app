@@ -9,7 +9,11 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from blog_db import FDataBase
+from forms import LoginForm, RegisterForm, AddPostForm
 from user_login import UserLogin
+
+# TODO correct work with post URL.
+
 
 blog = Flask(__name__)
 blog.config['SECRET_KEY'] = 'q12we34rt56y'
@@ -84,8 +88,9 @@ def post_page(alias):
 
 @blog.route('/add_post', methods=['GET', 'POST'])
 def add_post():
-    if request.method == 'POST':
-        req_data = (request.form['title'], request.form['post'], request.form['url'])
+    post_form = AddPostForm()
+    if post_form.validate_on_submit():
+        req_data = (post_form.header.data, post_form.post_url.data, post_form.post_url.data)
         if all(req_data):
             res = dbase.add_post(*req_data)
             if not res:
@@ -95,7 +100,7 @@ def add_post():
         else:
             flash('Ошибка добавления статьи', 'danger')
 
-    return render_template('add_post.html', links=dbase.get_menu(), title='Добавление статьи')
+    return render_template('add_post.html', links=dbase.get_menu(), title='Добавление статьи', form=post_form)
 
 
 @blog.teardown_appcontext
@@ -113,36 +118,36 @@ def info_page():
 def login_page():
     if current_user.is_authenticated:
         return redirect(url_for('profile_page'))
-    if request.method == 'POST':
-        email = request.form['e-mail']
+    login_form = LoginForm()
+    if login_form.validate_on_submit():
+        email = login_form.email.data
         user = dbase.get_user_by_email(email)
-        if user and check_password_hash(user['password'], request.form['password']):
+        if user and check_password_hash(user['password'], login_form.pswd.data):
             logged_user = UserLogin().create(user)
-            rm = True if request.form.get('remember') else False
+            rm = True if login_form.rm.data else False
             login_user(logged_user, remember=rm)
             return redirect(request.args.get('next') or url_for('profile_page'))
         flash('Wrong email or password', 'danger')
 
-    return render_template('login.html', links=dbase.get_menu())
+    return render_template('login.html', links=dbase.get_menu(), form=login_form)
 
 
 @blog.route('/register', methods=['POST', 'GET'])
 def register_page():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['e-mail']
-        pswd = request.form['password']
-        if username and email and pswd and (pswd == request.form['password_sbmt']):
-            pswd_hash = generate_password_hash(pswd)
-            res = dbase.add_user(username, email, pswd_hash)
-            if res:
-                flash('Вы успешно зарегистрировались', 'success')
-                return redirect(url_for('login_page'))
-            else:
-                flash('Ошибка при добавлении в БД', 'danger')
+    reg_form = RegisterForm()
+    if reg_form.validate_on_submit():
+        username = reg_form.name.data
+        email = reg_form.email.data
+        pswd = reg_form.pswd.data
+        pswd_hash = generate_password_hash(pswd)
+        res = dbase.add_user(username, email, pswd_hash)
+        if res:
+            flash('Вы успешно зарегистрировались', 'success')
+            return redirect(url_for('login_page'))
         else:
-            flash('Неверно заполнены поля', 'danger')
-    return render_template('register.html', links=dbase.get_menu())
+            flash('Ошибка при добавлении в БД', 'danger')
+
+    return render_template('register.html', links=dbase.get_menu(), form=reg_form)
 
 
 @blog.route('/profile')
@@ -192,6 +197,13 @@ def logout_page():
 
 @blog.errorhandler(404)
 def error_404(error):
+    db = get_db()
+    dbase = FDataBase(db)
+    return render_template('error_404.html', links=dbase.get_menu())
+
+
+@blog.errorhandler(413)
+def error_413(error):
     db = get_db()
     dbase = FDataBase(db)
     return render_template('error_404.html', links=dbase.get_menu())

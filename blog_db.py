@@ -20,6 +20,19 @@ class FDataBase:
             print('Read error')
             return []
 
+    def get_cols(self, tab):
+        try:
+            self.__cur.execute(f'''SELECT * FROM {tab} LIMIT 1''')
+            res = self.__cur.fetchone()
+
+            if res:
+                print(res.keys())
+                return res.keys()
+        except:
+            print('Get cols error')
+            return []
+
+    # posts part
     def get_posts(self, sort_by='time'):
         try:
             self.__cur.execute(f'''SELECT * FROM posts ORDER BY {sort_by} DESC''')
@@ -40,19 +53,7 @@ class FDataBase:
             print('Read post error')
             return (False, False)
 
-    def get_cols(self, tab):
-        try:
-            self.__cur.execute(f'''SELECT * FROM {tab} LIMIT 1''')
-            res = self.__cur.fetchone()
-
-            if res:
-                print(res.keys())
-                return res.keys()
-        except:
-            print('Get cols error')
-            return []
-
-    def add_post(self, title, post, url):
+    def add_post(self, title, url, post):
         try:
             self.__cur.execute(f'''SELECT COUNT() AS "count" FROM "posts" WHERE url LIKE "{url}"''')
             res = self.__cur.fetchone()
@@ -72,6 +73,8 @@ class FDataBase:
             print('Insertion post error')
             return False
         return True
+
+    # users part
 
     def add_user(self, user, email, hpswd):
         try:
