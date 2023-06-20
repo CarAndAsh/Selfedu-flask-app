@@ -1,0 +1,12 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    {{ super() }}
+<form action="{{ url_for('.login_admin') }}" method="post">
+    <ul>
+        <li><label>Логин : <input name="user" type="text"></label></li>
+        <li><label>Пароль : <input name="pswd" type="password"></label></li>
+        <li><input type="submit" value="Войти"></li>
+    </ul>
+</form>
+{% endblock %}

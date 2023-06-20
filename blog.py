@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from blog_db import FDataBase
 from forms import LoginForm, RegisterForm, AddPostForm
 from user_login import UserLogin
+from admin.admin import admin
 
 # TODO correct work with post URL.
 
@@ -23,6 +24,7 @@ blog.config['MAX_CONTENT_LENGTH'] = 1024 * 1024  # 1MB
 b_blog = Bootstrap(blog)
 blog.config.update(dict(DATABASE=os.path.join(blog.root_path, 'blog_DB.db')))
 
+blog.register_blueprint(admin, url_prefix='/admin')
 log_blog = LoginManager(blog)
 log_blog.login_message = 'Пожалуйста, войдите в ваш аккаунт для просмотра статей'
 log_blog.login_message_category = 'warning'
@@ -73,7 +75,7 @@ def get_db():
 
 @blog.route('/')
 def main_page():
-    return render_template('main.html', links=dbase.get_menu(),
+    return render_template('main.html', title='Главная', links=dbase.get_menu(),
                            posts=dbase.get_posts())
 
 
@@ -83,7 +85,7 @@ def post_page(alias):
     post = dbase.get_post(alias)
     if not post:
         abort(404)
-    return render_template('post.html', links=dbase.get_menu(), post=post)
+    return render_template('post.html', title='Статья', links=dbase.get_menu(), post=post)
 
 
 @blog.route('/add_post', methods=['GET', 'POST'])
@@ -129,7 +131,7 @@ def login_page():
             return redirect(request.args.get('next') or url_for('profile_page'))
         flash('Wrong email or password', 'danger')
 
-    return render_template('login.html', links=dbase.get_menu(), form=login_form)
+    return render_template('login.html', title='Авторизация', links=dbase.get_menu(), form=login_form)
 
 
 @blog.route('/register', methods=['POST', 'GET'])
@@ -147,13 +149,13 @@ def register_page():
         else:
             flash('Ошибка при добавлении в БД', 'danger')
 
-    return render_template('register.html', links=dbase.get_menu(), form=reg_form)
+    return render_template('register.html', title='Регистрация', links=dbase.get_menu(), form=reg_form)
 
 
 @blog.route('/profile')
 @login_required
 def profile_page():
-    return render_template('profile.html', user_info=current_user, links=dbase.get_menu())
+    return render_template('profile.html', user_info=current_user, title='Профиль', links=dbase.get_menu())
 
 
 @blog.route('/user_avatar')
@@ -199,14 +201,14 @@ def logout_page():
 def error_404(error):
     db = get_db()
     dbase = FDataBase(db)
-    return render_template('error_404.html', links=dbase.get_menu())
+    return render_template('error_404.html', title='Страница не найдена', links=dbase.get_menu())
 
 
 @blog.errorhandler(413)
 def error_413(error):
     db = get_db()
     dbase = FDataBase(db)
-    return render_template('error_404.html', links=dbase.get_menu())
+    return render_template('error_404.html', title='413', links=dbase.get_menu())
 
 
 if __name__ == '__main__':

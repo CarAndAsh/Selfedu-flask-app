@@ -11,23 +11,24 @@
 </head>
 <body>
 {% block navbar %}
-    <nav class="navbar navbar-static-top" style="background-color: crimson">
+    <nav class="navbar navbar-static-top" style="background-color: #1471dc">
         <ul style="list-style-type: none; display: flex; justify-content: space-between">
-            {% for i in links %}
+            {% for url, title in menu.items() %}
                 <li class="navbar-text">
                     <a style="font-family: Comic Sans MS,serif;
-                        color: chartreuse;
+                        color: #ffcc00;
                         font-size: large;
                         text-decoration: None"
-                       href="{{ i.url }}">{{ i.title }}</a>
+                       href="{{ url }}">{{ title }}</a>
                 </li>
             {% endfor %}
-            <li class="navbar-text">
+                <li class="navbar-text">
                     <a style="font-family: Comic Sans MS,serif;
-                        color: chartreuse;
+                        color: #ffcc00;
                         font-size: large;
                         text-decoration: None"
-                       href="{{ url_for('admin.main_admin') }}">Админ. панель</a></li>
+                       href="{{ url_for('main_page') }}">Блог</a>
+                </li>
         </ul>
     </nav>
 {% endblock %}
